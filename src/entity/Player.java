@@ -19,7 +19,7 @@ public class Player extends Entity{
         setDefaultValues();
         getPlayerImage();
     }
-
+//test comment
     public void setDefaultValues(){
         x=100;
         y=100;
