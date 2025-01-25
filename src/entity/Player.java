@@ -63,7 +63,7 @@ public class Player extends Entity{
             }
 
             spriteCounter++;
-            if(spriteCounter>10){
+            if(spriteCounter>12){
                 if(spritNum==1){
                     spritNum =2;
                 } else if (spritNum==2) {
@@ -75,9 +75,9 @@ public class Player extends Entity{
 
     }
 
-    public void draw(Graphics g2){
-//        g2.setColor(Color.white);
-//        g2.fillRect(x, y, gp.tileSize, gp.tileSize);
+    public void draw(Graphics2D g2){
+    //    g2.setColor(Color.white);
+    //    g2.fillRect(x, y, gp.tileSize, gp.tileSize);
         BufferedImage image = null;
          switch (direction){
              case  "up":
