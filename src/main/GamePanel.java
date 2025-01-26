@@ -33,9 +33,9 @@ public class GamePanel extends JPanel implements Runnable{
     KeyHandler keyH = new KeyHandler();
     Sound music = new Sound();
     Sound se = new Sound();
-
     public CollissionChecker cChecker = new CollissionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    public UI ui = new UI(this);
     Thread gameThread;
 
     // ENTITY AND OBJECT
@@ -111,6 +111,10 @@ public class GamePanel extends JPanel implements Runnable{
         }
         //player
         player.draw(g2);
+
+        //UI
+        ui.draw(g2);
+
         g2.dispose();
     }
     public void playMusic(int i){
