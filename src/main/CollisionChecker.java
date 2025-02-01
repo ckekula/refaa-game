@@ -2,10 +2,11 @@ package main;
 
 import entity.Entity;
 
-public class CollissionChecker {
+public class CollisionChecker {
     GamePanel gp;
+    private static final int MAX_OBJECTS = 999;
 
-    public CollissionChecker(GamePanel gp) {
+    public CollisionChecker(GamePanel gp) {
         this.gp = gp;
     }
 
@@ -59,7 +60,7 @@ public class CollissionChecker {
     }
 
     public int checkObject(Entity entity, boolean player) {
-        int index = 999;
+        int index = MAX_OBJECTS;
 
         for(int i=0; i<gp.obj.length; i++) {
             if(gp.obj[i] != null) {
