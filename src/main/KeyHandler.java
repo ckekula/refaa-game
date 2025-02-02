@@ -4,28 +4,30 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
-
     public boolean upPressed, downPressed, leftPressed, rightPressed;
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
+        System.out.println("Key pressed: " + code); // Debug log
 
-        if(code == KeyEvent.VK_W){
-            upPressed = true;
-        }
-        if(code == KeyEvent.VK_S){
-            downPressed = true;
-        }
-        if(code == KeyEvent.VK_A){
-            leftPressed = true;
-        }
-        if(code == KeyEvent.VK_D){
-            rightPressed = true;
+        switch (code) {
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_UP:
+                upPressed = true;
+                break;
+            case KeyEvent.VK_S:
+            case KeyEvent.VK_DOWN:
+                downPressed = true;
+                break;
+            case KeyEvent.VK_A:
+            case KeyEvent.VK_LEFT:
+                leftPressed = true;
+                break;
+            case KeyEvent.VK_D:
+            case KeyEvent.VK_RIGHT:
+                rightPressed = true;
+                break;
         }
     }
 
@@ -33,18 +35,28 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
 
-        if(code == KeyEvent.VK_W){
-            upPressed = false;
-        }
-        if(code == KeyEvent.VK_S){
-            downPressed = false;
-        }
-        if(code == KeyEvent.VK_A){
-            leftPressed = false;
-        }
-        if(code == KeyEvent.VK_D){
-            rightPressed = false;
+        switch (code) {
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_UP:
+                upPressed = false;
+                break;
+            case KeyEvent.VK_S:
+            case KeyEvent.VK_DOWN:
+                downPressed = false;
+                break;
+            case KeyEvent.VK_A:
+            case KeyEvent.VK_LEFT:
+                leftPressed = false;
+                break;
+            case KeyEvent.VK_D:
+            case KeyEvent.VK_RIGHT:
+                rightPressed = false;
+                break;
         }
     }
-    
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // Not used
+    }
 }

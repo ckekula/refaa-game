@@ -31,11 +31,11 @@ public class UI {
         message = text;
         messageOn = true;
     }
+
     // Show the no of key has player
     public void draw(Graphics2D g2){
 
         if(gameFinished == true){
-
             g2.setFont(arial_40);
             g2.setColor(Color.white);
 
@@ -69,12 +69,16 @@ public class UI {
         else {
             g2.setFont(arial_40);
             g2.setColor(Color.white);
-            g2.drawImage(keyImage, gp.tileSize/2,gp.tileSize/2,gp.tileSize,gp.tileSize,null);
-            g2.drawString("Key= "+ gp.player.hasKey,74,65);
+            g2.drawImage(keyImage, gp.tileSize/2, gp.tileSize/2, gp.tileSize, gp.tileSize, null);
 
-            // TIME
-            playTime += (double) 1/6;
-            g2.drawString("Time: "+dFormat.format(playTime),gp.tileSize*11,65);
+            // Add null check for player
+            if(gp.player != null) {
+                g2.drawString("Key= " + gp.player.hasKey, 74, 65);
+
+                // TIME
+                playTime += (double) 1/6;
+                g2.drawString("Time: " + dFormat.format(playTime), gp.tileSize*11, 65);
+            }
 
             // MESSAGE
             if (messageOn == true){
@@ -88,7 +92,7 @@ public class UI {
                     messageCounter = 0;
                     messageOn = false;
                 }
-        }
+            }
         }
     }
 }
