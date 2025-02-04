@@ -17,6 +17,9 @@ public class MultiplayerTest {
         window1.setLocation(100, 100); // Position first window
         window1.setVisible(true);
 
+        // Request focus for the first window
+        gamePanel1.requestFocusInWindow();
+
         // Create second window (Client)
         JFrame window2 = new JFrame();
         window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,18 +32,21 @@ public class MultiplayerTest {
         window2.setLocation(900, 100); // Position second window
         window2.setVisible(true);
 
+        // Request focus for the second window
+        gamePanel2.requestFocusInWindow();
+
         // Add buttons for host/join
         JButton hostButton = new JButton("Host Game");
         JButton joinButton = new JButton("Join Game");
 
         hostButton.addActionListener(e -> {
             gamePanel1.setupMultiplayer(true);
-            window1.requestFocus();
+            gamePanel1.requestFocusInWindow();
         });
 
         joinButton.addActionListener(e -> {
             gamePanel2.setupMultiplayer(false);
-            window2.requestFocus();
+            gamePanel2.requestFocusInWindow();
         });
 
         // Add control panels

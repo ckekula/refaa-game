@@ -16,7 +16,6 @@ public class NetworkPlayer extends Player {
     @Override
     public void update() {
         if (isLocalPlayer) {
-            System.out.println("Updating local player - KeyH up pressed: " + keyH.upPressed);
             super.update();
 
             // Only send state if there was actual movement
