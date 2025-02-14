@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class Main {
     public static void main(String[] args) {
         int port = 12345;
         try (ServerSocket serverSocket = new ServerSocket(port)) {

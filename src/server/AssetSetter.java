@@ -1,17 +1,16 @@
-package main;
+package server;
 
-import object.OBJ_Boots;
-import object.OBJ_Chest;
-import object.OBJ_Door;
-import object.OBJ_Key;
+import server.object.OBJ_Boots;
+import server.object.OBJ_Chest;
+import server.object.OBJ_Door;
+import server.object.OBJ_Key;
 
 public class AssetSetter {
 
-    GamePanel gp;
+    GameEngine gp;
 
-    public AssetSetter(GamePanel gp){
+    public AssetSetter(GameEngine gp){
         this.gp = gp;
-
     }
 
     public void setObject(){

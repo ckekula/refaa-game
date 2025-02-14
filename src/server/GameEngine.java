@@ -1,9 +1,20 @@
 package server;
 
-import main.AssetSetter;
-import main.CollisionChecker;
+import server.object.SuperObject;
+import server.state.GameState;
+import server.state.KeyState;
+import server.state.ObjectState;
+import server.state.PlayerState;
+import server.tile.TileManager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameEngine implements Runnable {
+    private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
+    private final List<KeyState> keyStates = new ArrayList<>();
+
     // Game settings
     public final int tileSize = 48;
     public final int maxScreenCol = 16;
@@ -16,7 +27,6 @@ public class GameEngine implements Runnable {
     // Game components
     public TileManager tileM;
     public CollisionChecker cChecker;
-    public AssetSetter aSetter;
     public Player player;
     public SuperObject[] obj = new SuperObject[10];
     public KeyState keyState = new KeyState();
@@ -32,9 +42,7 @@ public class GameEngine implements Runnable {
     public GameEngine() {
         tileM = new TileManager(this);
         cChecker = new CollisionChecker(this);
-        aSetter = new AssetSetter(this);
         player = new Player(this);
-        aSetter.setObject();
     }
 
     public void startGameThread() {
@@ -61,37 +69,72 @@ public class GameEngine implements Runnable {
         }
     }
 
-    public void update() {
-        player.update(keyState);
+    public synchronized void addPlayer(Player player, KeyState keyState) {
+        players.add(player);
+        keyStates.add(new KeyState());
+    }
+
+    public synchronized void removePlayer(Player player) {
+        int index = players.indexOf(player);
+        if (index != -1) {
+            players.remove(index);
+            keyStates.remove(index);
+        }
+    }
+
+    public synchronized void update() {
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).update(keyStates.get(i));
+        }
         playTime += 1.0 / 60;
 
-        // Check game completion
         if (gameFinished) {
             gameThread = null;
         }
     }
 
-    public GameState getCurrentGameState() {
+    public synchronized GameState getCurrentGameState() {
         GameState state = new GameState();
-        state.playerWorldX = player.worldX;
-        state.playerWorldY = player.worldY;
-        state.playerDirection = player.direction;
-        state.playerSpriteNum = player.spriteNum;
-        state.hasKey = player.hasKey;
-        state.message = message;
-        state.messageOn = messageOn;
-        state.playTime = playTime;
-        state.gameFinished = gameFinished;
+        state.players = new ArrayList<>();
+        for (Player player : players) {
+            PlayerState playerState = new PlayerState();
+            playerState.worldX = player.worldX;
+            playerState.worldY = player.worldY;
+            playerState.direction = player.direction;
+            playerState.spriteNum = player.spriteNum;
+            playerState.hasKey = player.hasKey;
+            state.players.add(playerState);
+        }
         state.objects = new ObjectState[obj.length];
         for (int i = 0; i < obj.length; i++) {
             if (obj[i] != null) {
                 state.objects[i] = new ObjectState(obj[i].worldX, obj[i].worldY, obj[i].name);
             }
         }
+        state.message = message;
+        state.messageOn = messageOn;
+        state.playTime = playTime;
+        state.gameFinished = gameFinished;
         return state;
     }
 
-    public void updateKeyState(KeyState keyState) {
-        this.keyState = keyState;
+    public void updateKeyState(int playerIndex, KeyState keyState) {
+        keyStates.set(playerIndex, keyState);
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
+    public int getTileSize() {
+        return tileSize;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 }

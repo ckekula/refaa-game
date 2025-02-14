@@ -1,4 +1,4 @@
-package server;
+package server.state;
 
 import java.io.Serializable;
 

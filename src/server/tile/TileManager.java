@@ -1,6 +1,7 @@
-package server;
+package server.tile;
 
-import main.GameEngine;
+import server.GameEngine;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
