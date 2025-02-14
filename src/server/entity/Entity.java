@@ -1,4 +1,4 @@
-package server;
+package server.entity;
 
 import java.awt.Rectangle;
 

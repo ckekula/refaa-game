@@ -20,32 +20,32 @@ public class TileManager {
     }
 
     private void initializeTiles() {
-        // Set collision properties only (no image loading)
-        tile[0] = new Tile(); // Grass
-        tile[1] = new Tile(); tile[1].collision = true; // Wall
-        tile[2] = new Tile(); tile[2].collision = true; // Water
-        tile[3] = new Tile(); // Earth
-        tile[4] = new Tile(); tile[4].collision = true; // Tree
-        tile[5] = new Tile(); // Sand
+        // Initialize tiles with collision properties
+        tile[0] = new Tile(false); // Grass (no collision)
+        tile[1] = new Tile(true);  // Wall (collision)
+        tile[2] = new Tile(true);  // Water (collision)
+        tile[3] = new Tile(false); // Earth (no collision)
+        tile[4] = new Tile(true);  // Tree (collision)
+        tile[5] = new Tile(false); // Sand (no collision)
     }
 
     public void loadMap(String mapPath) {
-        try(InputStream is = getClass().getResourceAsStream(mapPath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+        try (InputStream is = getClass().getResourceAsStream(mapPath);
+             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
             int col = 0;
             int row = 0;
 
-            while(row < gp.maxWorldRow) {
+            while (row < gp.maxWorldRow) {
                 String line = br.readLine();
                 String[] numbers = line.split(" ");
 
-                for(col = 0; col < gp.maxWorldCol; col++) {
+                for (col = 0; col < gp.maxWorldCol; col++) {
                     mapTileNum[col][row] = Integer.parseInt(numbers[col]);
                 }
                 row++;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

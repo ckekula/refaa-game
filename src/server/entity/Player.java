@@ -1,5 +1,6 @@
-package server;
+package server.entity;
 
+import server.GameEngine;
 import server.object.SuperObject;
 import server.state.KeyState;
 

@@ -1,5 +1,6 @@
 package server;
 
+import server.entity.Player;
 import server.state.GameState;
 import server.state.KeyState;
 

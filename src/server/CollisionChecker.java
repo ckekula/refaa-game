@@ -1,5 +1,7 @@
 package server;
 
+import server.entity.Entity;
+
 public class CollisionChecker {
     private final GameEngine ge;
 
