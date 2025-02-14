@@ -1,10 +1,9 @@
 package client;
 
-import entity.Player;
-import object.SuperObject;
-import server.GameState;
-import server.KeyState;
-import tile.TileManager;
+import client.entity.Player;
+import client.tile.TileManager;
+import server.state.GameState;
+import server.state.KeyState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,13 +12,15 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GamePanel extends JPanel {
     private GameState gameState;
     private final ObjectOutputStream out;
     private final KeyState keyState = new KeyState();
     private final TileManager tileM;
-    private final Player playerForRendering;
+    private final Map<String, BufferedImage> objectImages = new HashMap<>();
 
     // Screen settings
     final int tileSize = 48;
@@ -30,8 +31,7 @@ public class GamePanel extends JPanel {
 
     public GamePanel(ObjectOutputStream out) {
         this.out = out;
-        tileM = new TileManager(this);
-        playerForRendering = new Player();
+        tileM = new TileManager();
         setPreferredSize(new Dimension(screenWidth, screenHeight));
         setBackground(Color.BLACK);
         setDoubleBuffered(true);
@@ -80,49 +80,48 @@ public class GamePanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
 
         // Draw tiles
-        tileM.draw(g2);
+        tileM.draw(g2, gameState.getPlayerWorldX(0), gameState.getPlayerWorldY(0), screenWidth, screenHeight, tileSize);
 
         // Draw objects
         for (int i = 0; i < gameState.objects.length; i++) {
             if (gameState.objects[i] != null) {
-                SuperObject obj = new SuperObject();
-                obj.worldX = gameState.objects[i].worldX;
-                obj.worldY = gameState.objects[i].worldY;
-                obj.name = gameState.objects[i].name;
-                obj.image = getObjectImage(obj.name);
-                obj.draw(g2, this);
+                BufferedImage image = getObjectImage(gameState.objects[i].name);
+                int screenX = gameState.objects[i].worldX - gameState.getPlayerWorldX(0) + screenWidth / 2 - (tileSize / 2);
+                int screenY = gameState.objects[i].worldY - gameState.getPlayerWorldY(0) + screenHeight / 2 - (tileSize / 2);
+                g2.drawImage(image, screenX, screenY, tileSize, tileSize, null);
             }
         }
 
-        // Draw player
-        playerForRendering.worldX = gameState.playerWorldX;
-        playerForRendering.worldY = gameState.playerWorldY;
-        playerForRendering.direction = gameState.playerDirection;
-        playerForRendering.spriteNum = gameState.playerSpriteNum;
-        BufferedImage image = getPlayerImage();
-        int screenX = screenWidth/2 - (tileSize/2);
-        int screenY = screenHeight/2 - (tileSize/2);
-        g2.drawImage(image, screenX, screenY, tileSize, tileSize, null);
+        // Draw players
+        for (int i = 0; i < gameState.players.size(); i++) {
+            Player player = new Player();
+            player.worldX = gameState.players.get(i).worldX;
+            player.worldY = gameState.players.get(i).worldY;
+            player.direction = gameState.players.get(i).direction;
+            player.spriteNum = gameState.players.get(i).spriteNum;
+            BufferedImage image = player.getPlayerImage();
+            int screenX = screenWidth / 2 - (tileSize / 2);
+            int screenY = screenHeight / 2 - (tileSize / 2);
+            g2.drawImage(image, screenX, screenY, tileSize, tileSize, null);
+        }
 
         // Draw UI
-        UI ui = new UI(this);
-        ui.hasKey = gameState.hasKey;
+        UI ui = new UI();
+        ui.hasKey = gameState.getHasKey();
         ui.message = gameState.message;
         ui.messageOn = gameState.messageOn;
         ui.playTime = gameState.playTime;
         ui.gameFinished = gameState.gameFinished;
-        ui.draw(g2);
+        ui.draw(g2, screenWidth, screenHeight, tileSize, ui.hasKey);
 
         g2.dispose();
     }
 
-    private BufferedImage getPlayerImage() {
-        // Implement based on direction and spriteNum
-        return new BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB);
-    }
-
     private BufferedImage getObjectImage(String name) {
-        // Implement based on object name
-        return new BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB);
+        return objectImages.computeIfAbsent(name, k -> {
+            SuperObject obj = new SuperObject();
+            obj.loadImage("/objects/" + name.toLowerCase() + ".png");
+            return obj.image;
+        });
     }
 }

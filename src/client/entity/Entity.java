@@ -1,4 +1,4 @@
-package client;
+package client.entity;
 
 import java.awt.Rectangle;
 
