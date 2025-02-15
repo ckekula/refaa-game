@@ -13,7 +13,12 @@ public class TileManager {
 
     public TileManager() {
         tile = new Tile[10];
+        mapTileNum = new int[50][50];
         loadTiles();
+    }
+
+    public void setMapTileNum(int[][] newMapTileNum) {
+        this.mapTileNum = newMapTileNum;
     }
 
     private void loadTiles() {

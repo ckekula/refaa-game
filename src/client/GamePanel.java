@@ -24,6 +24,8 @@ public class GamePanel extends JPanel {
     private final KeyState keyState = new KeyState();
     private final TileManager tileM;
     private final Map<String, BufferedImage> objectImages = new HashMap<>();
+    private final Sound sound = new Sound();
+    private boolean playingBGM = false;
 
     // Screen settings
     final int tileSize = 48;
@@ -40,6 +42,7 @@ public class GamePanel extends JPanel {
         setDoubleBuffered(true);
         setupKeyListener();
         preloadObjectImages();
+        playMusic(0);
     }
 
     private void preloadObjectImages() {
@@ -65,22 +68,80 @@ public class GamePanel extends JPanel {
     }
 
     private void handleKey(int keyCode, boolean pressed) {
-        switch (keyCode) {
-            case KeyEvent.VK_W -> keyState.upPressed = pressed;
-            case KeyEvent.VK_S -> keyState.downPressed = pressed;
-            case KeyEvent.VK_A -> keyState.leftPressed = pressed;
-            case KeyEvent.VK_D -> keyState.rightPressed = pressed;
-        }
         try {
+            switch (keyCode) {
+                case KeyEvent.VK_W -> keyState.upPressed = pressed;
+                case KeyEvent.VK_S -> keyState.downPressed = pressed;
+                case KeyEvent.VK_A -> keyState.leftPressed = pressed;
+                case KeyEvent.VK_D -> keyState.rightPressed = pressed;
+            }
             out.writeObject(keyState);
+            out.reset(); // Clear the object cache
             out.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void updateGameState(GameState state) {
-        this.gameState = state;
+    private void playMusic(int i) {
+        sound.setFile(i);
+        sound.play();
+        sound.loop();
+        playingBGM = true;
+    }
+
+    private void stopMusic() {
+        sound.stop();
+        playingBGM = false;
+    }
+
+    private void playSE(int i) {
+        sound.setFile(i);
+        sound.play();
+    }
+
+    public void updateGameState(GameState newState) {
+        GameState oldState = this.gameState;
+        this.gameState = newState;
+
+        if (newState.mapTileNum != null) {
+            tileM.setMapTileNum(newState.mapTileNum);
+        }
+
+        // Play sound effects based on state changes
+        if (oldState != null) {
+            // Key collected
+            if (newState.getHasKey() > oldState.getHasKey()) {
+                playSE(1); // coin sound
+            }
+            // Door opened
+            if (oldState.objects != null && newState.objects != null) {
+                for (int i = 0; i < oldState.objects.length; i++) {
+                    if (oldState.objects[i] != null &&
+                            newState.objects[i] == null &&
+                            "Door".equals(oldState.objects[i].name)) {
+                        playSE(3); // unlock sound
+                    }
+                }
+            }
+            // Boots collected
+            if (oldState.objects != null && newState.objects != null) {
+                for (int i = 0; i < oldState.objects.length; i++) {
+                    if (oldState.objects[i] != null &&
+                            newState.objects[i] == null &&
+                            "Boots".equals(oldState.objects[i].name)) {
+                        playSE(2); // powerup sound
+                    }
+                }
+            }
+            // Game finished
+            if (!oldState.gameFinished && newState.gameFinished) {
+                playSE(4); // fanfare sound
+                stopMusic();
+            }
+        }
+
+        repaint();
     }
 
     @Override
@@ -95,7 +156,7 @@ public class GamePanel extends JPanel {
 
         // Draw tiles
         System.out.println("[GamePanel] Painting tiles");
-        tileM.draw(g2, gameState.getPlayerWorldX(0), gameState.getPlayerWorldY(0), screenWidth, screenHeight, tileSize);
+        paintTiles(g2);
 
         // Draw objects
         System.out.println("[GamePanel] Painting objects");
@@ -131,6 +192,40 @@ public class GamePanel extends JPanel {
         ui.draw(g2, screenWidth, screenHeight, tileSize, ui.hasKey);
 
         g2.dispose();
+    }
+
+    private void paintTiles(Graphics2D g2) {
+        if (gameState == null || gameState.mapTileNum == null || tileM == null) {
+            System.out.println("Missing data for tile rendering:");
+            System.out.println("gameState: " + (gameState == null ? "null" : "present"));
+            System.out.println("mapTileNum: " + (gameState == null ? "n/a" : (gameState.mapTileNum == null ? "null" : "present")));
+            System.out.println("tileM: " + (tileM == null ? "null" : "present"));
+            return;
+        }
+
+        int playerWorldX = gameState.getPlayerWorldX(0);
+        int playerWorldY = gameState.getPlayerWorldY(0);
+
+        for (int worldCol = 0; worldCol < gameState.mapTileNum.length; worldCol++) {
+            for (int worldRow = 0; worldRow < gameState.mapTileNum[worldCol].length; worldRow++) {
+                int worldX = worldCol * tileSize;
+                int worldY = worldRow * tileSize;
+                int screenX = worldX - playerWorldX + screenWidth / 2 - (tileSize / 2);
+                int screenY = worldY - playerWorldY + screenHeight / 2 - (tileSize / 2);
+
+                // Only render tiles that are visible on screen (with some margin)
+                if (screenX + tileSize > -tileSize && 
+                    screenX < screenWidth + tileSize && 
+                    screenY + tileSize > -tileSize && 
+                    screenY < screenHeight + tileSize) {
+                    
+                    int tileNum = gameState.mapTileNum[worldCol][worldRow];
+                    if (tileNum >= 0 && tileNum < tileM.tile.length && tileM.tile[tileNum] != null) {
+                        g2.drawImage(tileM.tile[tileNum].image, screenX, screenY, tileSize, tileSize, null);
+                    }
+                }
+            }
+        }
     }
 
     private BufferedImage getPlayerImage(PlayerState state) {
