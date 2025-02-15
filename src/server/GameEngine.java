@@ -14,7 +14,7 @@ import java.util.List;
 
 public class GameEngine implements Runnable {
     private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
-    private final List<KeyState> keyStates = new ArrayList<>();
+    private final List<KeyState> keyStates = Collections.synchronizedList(new ArrayList<>());
 
     // Game settings
     public final int tileSize = 48;
@@ -26,9 +26,8 @@ public class GameEngine implements Runnable {
     public final int maxWorldRow = 50;
 
     // Game components
-    public TileManager tileM;
-    public CollisionChecker cChecker;
-    public Player player;
+    public static TileManager tileM;
+    public static CollisionChecker cChecker;
     public SuperObject[] obj = new SuperObject[10];
     public KeyState keyState = new KeyState();
     private Thread gameThread;
@@ -43,7 +42,8 @@ public class GameEngine implements Runnable {
     public GameEngine() {
         tileM = new TileManager(this);
         cChecker = new CollisionChecker(this);
-        player = new Player(this);
+        AssetSetter assetSetter = new AssetSetter(this);
+        assetSetter.setObject();
     }
 
     public void startGameThread() {
@@ -61,7 +61,8 @@ public class GameEngine implements Runnable {
 
             try {
                 double remainingTime = (nextDrawTime - System.nanoTime()) / 1000000;
-                if (remainingTime < 0) remainingTime = 0;
+                if (remainingTime < 0)
+                    remainingTime = 0;
                 Thread.sleep((long) remainingTime);
                 nextDrawTime += drawInterval;
             } catch (InterruptedException e) {
@@ -72,7 +73,7 @@ public class GameEngine implements Runnable {
 
     public synchronized void addPlayer(Player player, KeyState keyState) {
         players.add(player);
-        keyStates.add(new KeyState());
+        keyStates.add(keyState);
     }
 
     public synchronized void removePlayer(Player player) {
@@ -97,6 +98,7 @@ public class GameEngine implements Runnable {
     public synchronized GameState getCurrentGameState() {
         GameState state = new GameState();
         state.players = new ArrayList<>();
+        state.mapTileNum = tileM.mapTileNum;
         for (Player player : players) {
             PlayerState playerState = new PlayerState();
             playerState.worldX = player.worldX;
@@ -116,6 +118,7 @@ public class GameEngine implements Runnable {
         state.messageOn = messageOn;
         state.playTime = playTime;
         state.gameFinished = gameFinished;
+        System.out.println("Setting game state to: " + state);
         return state;
     }
 

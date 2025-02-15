@@ -6,6 +6,7 @@ import java.util.List;
 public class GameState implements Serializable {
     public List<PlayerState> players;
     public ObjectState[] objects;
+    public int[][] mapTileNum;
     public String message;
     public boolean messageOn;
     public double playTime;

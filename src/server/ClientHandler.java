@@ -13,12 +13,14 @@ public class ClientHandler extends Thread {
     private ObjectInputStream in;
     private final Player player;
 
-    private final GameEngine sharedGameEngine = new GameEngine();
+    private GameEngine gameEngine = new GameEngine();
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
-        this.player = new Player(sharedGameEngine);
-        sharedGameEngine.addPlayer(player, new KeyState());
+        this.gameEngine = new GameEngine();
+        this.gameEngine.startGameThread();
+        this.player = new Player(gameEngine);
+        gameEngine.addPlayer(player, new KeyState());
     }
 
     public void run() {
@@ -27,20 +29,24 @@ public class ClientHandler extends Thread {
             in = new ObjectInputStream(clientSocket.getInputStream());
 
             // Send initial game state
-            synchronized (sharedGameEngine) {
-                out.writeObject(sharedGameEngine.getCurrentGameState());
+            synchronized (gameEngine) {
+                GameState initialState = gameEngine.getCurrentGameState();
+                out.writeObject(initialState);
+                out.flush();
+                System.out.println("[Server] Sent initial GameState to client");
             }
-            out.flush();
 
             // Game state update thread
             new Thread(() -> {
                 try {
                     while (!clientSocket.isClosed()) {
                         GameState state;
-                        synchronized (sharedGameEngine) {
-                            state = sharedGameEngine.getCurrentGameState();
+                        synchronized (gameEngine) {
+                            state = gameEngine.getCurrentGameState();
                         }
+                        System.out.println("Sending game state to client.");
                         out.writeObject(state);
+                        out.reset(); // Clear Object cache
                         out.flush();
                         Thread.sleep(1000 / 60);
                     }
@@ -53,10 +59,12 @@ public class ClientHandler extends Thread {
             while (!clientSocket.isClosed()) {
                 try {
                     KeyState keyState = (KeyState) in.readObject();
-                    synchronized (sharedGameEngine) {
-                        int playerIndex = sharedGameEngine.getPlayers().indexOf(player);
+                    System.out.println("Received key state from client: " + keyState);
+                    synchronized (gameEngine) {
+                        int playerIndex = gameEngine.getPlayers().indexOf(player);
                         if (playerIndex != -1) {
-                            sharedGameEngine.updateKeyState(playerIndex, keyState);
+                            gameEngine.updateKeyState(playerIndex, keyState);
+                            System.out.println("Updated key state of player " + playerIndex + ": " + keyState);
                         }
                     }
                 } catch (EOFException e) {
@@ -70,13 +78,17 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            synchronized (sharedGameEngine) {
-                sharedGameEngine.removePlayer(player);
+            synchronized (gameEngine) {
+                gameEngine.removePlayer(player);
+                System.out.println("Removed player from game engine.");
             }
             try {
-                if (in != null) in.close();
-                if (out != null) out.close();
-                if (clientSocket != null) clientSocket.close();
+                if (in != null)
+                    in.close();
+                if (out != null)
+                    out.close();
+                if (clientSocket != null)
+                    clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -18,12 +18,17 @@ public class Main {
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
+            // Wait for initial GameState
+            GameState initialState = (GameState) in.readObject();
+            System.out.println("[Client] Received initial GameState");
+
             JFrame window = new JFrame();
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setResizable(false);
             window.setTitle("REFAA Client");
 
             GamePanel gamePanel = new GamePanel(out);
+            gamePanel.updateGameState(initialState);
             window.add(gamePanel);
             window.pack();
             window.setLocationRelativeTo(null);
@@ -42,7 +47,7 @@ public class Main {
                 }
             }).start();
 
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

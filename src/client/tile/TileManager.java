@@ -13,17 +13,18 @@ public class TileManager {
 
     public TileManager() {
         tile = new Tile[10];
-        mapTileNum = new int[50][50];
         loadTiles();
-        loadMap("/maps/world01.txt");
     }
 
     private void loadTiles() {
         try {
-            tile[0] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/grass.png"))));
+            tile[0] = new Tile(
+                    ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/grass.png"))));
             tile[1] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/wall.png"))));
-            tile[2] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/water.png"))));
-            tile[3] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/earth.png"))));
+            tile[2] = new Tile(
+                    ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/water.png"))));
+            tile[3] = new Tile(
+                    ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/earth.png"))));
             tile[4] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/tree.png"))));
             tile[5] = new Tile(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/sand.png"))));
         } catch (Exception e) {
@@ -31,24 +32,10 @@ public class TileManager {
         }
     }
 
-    public void loadMap(String mapPath) {
-        try (InputStream is = getClass().getResourceAsStream(mapPath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            int row = 0;
-            while ((line = br.readLine()) != null && row < mapTileNum.length) {
-                String[] numbers = line.split(" ");
-                for (int col = 0; col < numbers.length && col < mapTileNum[row].length; col++) {
-                    mapTileNum[col][row] = Integer.parseInt(numbers[col]);
-                }
-                row++;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void draw(Graphics2D g2, int playerWorldX, int playerWorldY, int screenWidth, int screenHeight, int tileSize) {
+    public void draw(Graphics2D g2, int playerWorldX, int playerWorldY, int screenWidth, int screenHeight,
+            int tileSize) {
+        if (mapTileNum == null)
+            return;
         int screenCenterX = screenWidth / 2;
         int screenCenterY = screenHeight / 2;
 

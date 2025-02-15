@@ -22,22 +22,26 @@ public class TileManager {
     private void initializeTiles() {
         // Initialize tiles with collision properties
         tile[0] = new Tile(false); // Grass (no collision)
-        tile[1] = new Tile(true);  // Wall (collision)
-        tile[2] = new Tile(true);  // Water (collision)
+        tile[1] = new Tile(true); // Wall (collision)
+        tile[2] = new Tile(true); // Water (collision)
         tile[3] = new Tile(false); // Earth (no collision)
-        tile[4] = new Tile(true);  // Tree (collision)
+        tile[4] = new Tile(true); // Tree (collision)
         tile[5] = new Tile(false); // Sand (no collision)
     }
 
     public void loadMap(String mapPath) {
+        System.out.println("Loading map from: " + mapPath);
         try (InputStream is = getClass().getResourceAsStream(mapPath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
             int col = 0;
             int row = 0;
 
             while (row < gp.maxWorldRow) {
                 String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
                 String[] numbers = line.split(" ");
 
                 for (col = 0; col < gp.maxWorldCol; col++) {
@@ -45,7 +49,9 @@ public class TileManager {
                 }
                 row++;
             }
+            System.out.println("Map loading complete.");
         } catch (Exception e) {
+            System.err.println("Error loading map: " + e.getMessage());
             e.printStackTrace();
         }
     }
