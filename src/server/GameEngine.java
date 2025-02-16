@@ -29,7 +29,6 @@ public class GameEngine implements Runnable {
     public static TileManager tileM;
     public static CollisionChecker cChecker;
     public SuperObject[] obj = new SuperObject[10];
-    public KeyState keyState = new KeyState();
     private Thread gameThread;
     public int FPS = 60;
 
@@ -53,11 +52,11 @@ public class GameEngine implements Runnable {
 
     @Override
     public void run() {
-        double drawInterval = 1000000000.0 / FPS;
-        double nextDrawTime = System.nanoTime() + drawInterval;
+        double drawInterval = 1000000000.0 / FPS; // time between frames
+        double nextDrawTime = System.nanoTime() + drawInterval; // target time for next frame
 
         while (gameThread != null) {
-            update();
+            update(); // update player positions based on keystrokes
 
             try {
                 double remainingTime = (nextDrawTime - System.nanoTime()) / 1000000;
@@ -95,7 +94,8 @@ public class GameEngine implements Runnable {
         }
     }
 
-    public synchronized GameState getCurrentGameState() {
+    // create gameState object containing current state of all players, objects, and the map
+    public synchronized GameState getCurrentGameState() { // (synchronized) gameState sent to all clients periodically
         GameState state = new GameState();
         state.players = new ArrayList<>();
         state.mapTileNum = tileM.mapTileNum;

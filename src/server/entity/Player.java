@@ -25,6 +25,7 @@ public class Player extends Entity {
         direction = "down";
     }
 
+    // update player position based on KeyState received from client
     public void update(KeyState keyState) {
         if (keyState.upPressed || keyState.downPressed ||
                 keyState.leftPressed || keyState.rightPressed) {
@@ -40,11 +41,11 @@ public class Player extends Entity {
                 direction = "right";
             }
 
-            // Check collisions using the server's GameEngine
+            // Check collisions using GameEngine
             collisionOn = false;
             gameEngine.cChecker.checkTile(this);
 
-            // Check object collisions and process pickups
+            // Handle object pickups
             int objIndex = gameEngine.cChecker.checkObject(this, true);
             pickUpObject(objIndex);
 

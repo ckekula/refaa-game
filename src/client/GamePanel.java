@@ -1,5 +1,6 @@
 package client;
 
+import client.object.SuperObject;
 import client.tile.TileManager;
 import server.state.GameState;
 import server.state.KeyState;
@@ -52,6 +53,7 @@ public class GamePanel extends JPanel {
         }
     }
 
+    // listen for key presses and releases
     private void setupKeyListener() {
         addKeyListener(new KeyAdapter() {
             @Override
@@ -67,6 +69,7 @@ public class GamePanel extends JPanel {
         setFocusable(true);
     }
 
+    // update key state
     private void handleKey(int keyCode, boolean pressed) {
         try {
             switch (keyCode) {
@@ -75,7 +78,7 @@ public class GamePanel extends JPanel {
                 case KeyEvent.VK_A -> keyState.leftPressed = pressed;
                 case KeyEvent.VK_D -> keyState.rightPressed = pressed;
             }
-            out.writeObject(keyState);
+            out.writeObject(keyState); // send key state to server
             out.reset(); // Clear the object cache
             out.flush();
         } catch (IOException e) {
@@ -146,6 +149,7 @@ public class GamePanel extends JPanel {
         repaint();
     }
 
+    // calculate screen coordinates for each tile and object relative to players position
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -238,7 +242,7 @@ public class GamePanel extends JPanel {
 
         // Determine the correct image based on direction and spriteNum
         String key = state.direction + "_" + state.spriteNum;
-        return playerImages.getOrDefault(key, playerImages.get("down_1")); // Default to down_1 if not found
+        return playerImages.getOrDefault(key, playerImages.get("down_1"));
     }
 
     // Cache for player images
@@ -270,7 +274,7 @@ public class GamePanel extends JPanel {
 
     private BufferedImage getObjectImage(String name) {
         return objectImages.computeIfAbsent(name, k -> {
-            client.SuperObject obj = new client.SuperObject();
+            SuperObject obj = new SuperObject();
             obj.loadImage("/objects/" + name.toLowerCase() + ".png");
             return obj.image;
         });

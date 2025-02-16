@@ -15,18 +15,21 @@ public class Main {
 
         try {
             Socket socket = new Socket(serverAddress, port);
+
+            // set up ObjectOutputStream & ObjectInputStream to communicate with server
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            // Wait for initial GameState
+            // wait for initial GameState
             GameState initialState = (GameState) in.readObject();
             System.out.println("[Client] Received initial GameState");
 
-            JFrame window = new JFrame();
+            JFrame window = new JFrame(); // create new window
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setResizable(false);
             window.setTitle("REFAA Client");
 
+            // new GamePanel object to render the game
             GamePanel gamePanel = new GamePanel(out);
             gamePanel.updateGameState(initialState);
             window.add(gamePanel);
@@ -34,7 +37,7 @@ public class Main {
             window.setLocationRelativeTo(null);
             window.setVisible(true);
 
-            // Thread to receive game state updates from the server
+            // start new thread to receive game state updates from the server
             new Thread(() -> {
                 try {
                     while (true) {

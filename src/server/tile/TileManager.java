@@ -16,7 +16,7 @@ public class TileManager {
         tile = new Tile[10];
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
         initializeTiles();
-        loadMap("/maps/world01.txt");
+        loadMap("/maps/world01.txt"); // load map
     }
 
     private void initializeTiles() {
