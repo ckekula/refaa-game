@@ -31,25 +31,22 @@ public class TileManager {
 
     public void loadMap(String mapPath) {
         System.out.println("Loading map from: " + mapPath);
-        try (InputStream is = getClass().getResourceAsStream(mapPath);
-                BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+        try (InputStream is = getClass().getResourceAsStream(mapPath)) {
+            assert is != null;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
-            int col = 0;
-            int row = 0;
+                int row = 0;
+                String line;
 
-            while (row < gp.maxWorldRow) {
-                String line = br.readLine();
-                if (line == null) {
-                    break;
+                while ((line = br.readLine()) != null && row < gp.maxWorldRow) {
+                    String[] numbers = line.trim().split("\\s+");
+                    for (int col = 0; col < Math.min(numbers.length, gp.maxWorldCol); col++) {
+                        mapTileNum[col][row] = Integer.parseInt(numbers[col]);
+                    }
+                    row++;
                 }
-                String[] numbers = line.split(" ");
-
-                for (col = 0; col < gp.maxWorldCol; col++) {
-                    mapTileNum[col][row] = Integer.parseInt(numbers[col]);
-                }
-                row++;
+                System.out.println("Map loading complete.");
             }
-            System.out.println("Map loading complete.");
         } catch (Exception e) {
             System.err.println("Error loading map: " + e.getMessage());
             e.printStackTrace();

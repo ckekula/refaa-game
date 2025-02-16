@@ -36,6 +36,12 @@ public class Sound {
     }
 
     public void stop() {
-        clip.stop();
+        if (clip != null) {
+            System.out.println("Stopping and closing the clip.");
+            clip.stop();
+            clip.close();
+        } else {
+            System.out.println("Clip is null. Cannot stop music.");
+        }
     }
 }

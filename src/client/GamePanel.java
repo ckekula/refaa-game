@@ -84,15 +84,17 @@ public class GamePanel extends JPanel {
     }
 
     private void playMusic(int i) {
-        sound.setFile(i);
-        sound.play();
-        sound.loop();
-        playingBGM = true;
+        if (!playingBGM) {
+            sound.setFile(i);
+            sound.play();
+            sound.loop();
+            playingBGM = true;
+        }
     }
 
     private void stopMusic() {
-        sound.stop();
         playingBGM = false;
+        sound.stop();
     }
 
     private void playSE(int i) {
@@ -136,8 +138,8 @@ public class GamePanel extends JPanel {
             }
             // Game finished
             if (!oldState.gameFinished && newState.gameFinished) {
-                playSE(4); // fanfare sound
                 stopMusic();
+                playSE(4); // fanfare sound
             }
         }
 

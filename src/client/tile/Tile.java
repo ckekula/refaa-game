@@ -11,6 +11,7 @@ public class Tile {
         // Default constructor for cases where no image is passed
     }
 
-    public Tile (BufferedImage read) {
+    public Tile (BufferedImage image) {
+        this.image = image;
     }
 }
