@@ -1,8 +1,10 @@
-package object;
+package client.object;
+
+import client.SuperObject;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.IOException;
+import java.util.Objects;
 
 public class OBJ_Key extends SuperObject {
 
@@ -10,7 +12,7 @@ public class OBJ_Key extends SuperObject {
 
         name = "Key";
         try{
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/key.png"));
+            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/key.png")));
         }catch (IOException e){
             e.printStackTrace();
         }

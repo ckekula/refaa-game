@@ -1,4 +1,6 @@
-package object;
+package client.object;
+
+import client.SuperObject;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
